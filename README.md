@@ -65,8 +65,8 @@ All endpoints except login and Swagger require `Authorization: Bearer <jwt>`.
   commentary is shown to Turkish clinicians). Trade-off: a 3B model favors latency/footprint over
   depth. Swappable via `OLLAMA_MODEL`.
 - **Turkish doctor UI.** LabAssist is a tool for a Turkish hospital, so the doctor-facing UI and the AI interpretation are in **Turkish** (dates in `tr-TR`, Turkish patient names).
-- **Node/Express mock** as a *separate* service it represents an external analyzer the backend
-  polls over HTTP, so a distinct process was more reasonable here and in the future can be replkaced with a real device integration without affecting the backend's internal logic.
+- **Node/Express mock** as a *separate* service: it represents an external analyzer the backend
+  polls over HTTP, so a distinct process was the cleaner boundary here and can later be replaced with a real device integration without affecting the backend's internal logic.
 
 **Business logic & AI**
 
@@ -75,7 +75,7 @@ All endpoints except login and Swagger require `Authorization: Bearer <jwt>`.
   the ranges a device sends.
 - **Hybrid analysis.** A deterministic rule engine (`AbnormalityEvaluator`) decides what is
   `NORMAL/LOW/HIGH/CRITICAL_*`; the LLM only *narrates* a preliminary interpretation grounded in
-  those pre-computed flags. The system is never directly depends on the model, and flags are
+  those pre-computed flags. The system never directly depends on the model, and the flags are
   reproducible and testable.
 - **Privacy by design, no PII to the LLM.** The prompt contains only age, sex, analyte values,
   reference ranges and flags. Patient **name and MRN are never sent to the model** (unit-tested).
