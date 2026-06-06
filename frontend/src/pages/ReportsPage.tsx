@@ -15,6 +15,7 @@ import { listReports, getReportsSummary } from '../api/reports';
 import type { LabReportSummary, ReportStatus } from '../api/types';
 import { StatusChip } from '../components/StatusChip';
 import { useAuth } from '../auth/useAuth';
+import { formatDateTime, sexShort, statusLabel } from '../i18n/labels';
 
 function StatCard({ label, value, color }: { label: string; value: number | undefined; color?: string }) {
   return (
@@ -70,36 +71,36 @@ export function ReportsPage() {
     () => [
       {
         field: 'receivedAt',
-        headerName: 'Received',
+        headerName: 'Alındı',
         width: 170,
-        valueFormatter: (value) => (value ? new Date(value as string).toLocaleString() : ''),
+        valueFormatter: (value) => formatDateTime(value as string),
       },
-      { field: 'externalId', headerName: 'Report', width: 120 },
-      { field: 'patientName', headerName: 'Patient', flex: 1, minWidth: 140 },
+      { field: 'externalId', headerName: 'Rapor', width: 120 },
+      { field: 'patientName', headerName: 'Hasta', flex: 1, minWidth: 140 },
       {
         field: 'patient',
-        headerName: 'Age / Sex',
-        width: 110,
+        headerName: 'Yaş / Cinsiyet',
+        width: 120,
         sortable: false,
-        valueGetter: (_value, row) => `${row.patientAge ?? '?'} / ${row.patientSex ?? '?'}`,
+        valueGetter: (_value, row) => `${row.patientAge ?? '?'} / ${sexShort(row.patientSex)}`,
       },
-      { field: 'deviceId', headerName: 'Device', width: 120 },
+      { field: 'deviceId', headerName: 'Cihaz', width: 120 },
       {
         field: 'status',
-        headerName: 'Status',
+        headerName: 'Durum',
         width: 130,
         renderCell: (params) => <StatusChip status={params.value as ReportStatus} />,
       },
       {
         field: 'abnormalCount',
-        headerName: 'Abnormal',
+        headerName: 'Anormal',
         width: 110,
         renderCell: (params) =>
           params.value > 0 ? <Chip size="small" color="warning" label={params.value} /> : <span>-</span>,
       },
       {
         field: 'criticalCount',
-        headerName: 'Critical',
+        headerName: 'Kritik',
         width: 100,
         renderCell: (params) =>
           params.value > 0 ? <Chip size="small" color="error" label={params.value} /> : <span>-</span>,
@@ -110,19 +111,19 @@ export function ReportsPage() {
 
   return (
     <Stack spacing={2}>
-      <Typography variant="h5">Lab Reports</Typography>
+      <Typography variant="h5">Lab Raporları</Typography>
 
       <Stack direction="row" spacing={2} sx={{ flexWrap: 'wrap', rowGap: 2 }}>
-        <StatCard label="Reports" value={summary.data?.total} />
-        <StatCard label="With abnormal values" value={summary.data?.abnormal} color="warning.main" />
-        <StatCard label="With critical values" value={summary.data?.critical} color="error.main" />
-        {isAdmin && <StatCard label="Rejected (malformed)" value={summary.data?.rejected} color="text.secondary" />}
+        <StatCard label="Rapor" value={summary.data?.total} />
+        <StatCard label="Anormal değerli" value={summary.data?.abnormal} color="warning.main" />
+        <StatCard label="Kritik değerli" value={summary.data?.critical} color="error.main" />
+        {isAdmin && <StatCard label="Reddedilen (hatalı)" value={summary.data?.rejected} color="text.secondary" />}
       </Stack>
 
       <Paper sx={{ p: 2 }}>
         <Stack direction="row" spacing={2} alignItems="center" sx={{ flexWrap: 'wrap', rowGap: 2 }}>
           <TextField
-            label="Search report id"
+            label="Rapor no ara"
             size="small"
             value={q}
             onChange={(e) => {
@@ -132,23 +133,23 @@ export function ReportsPage() {
           />
           <TextField
             select
-            label="Status"
+            label="Durum"
             size="small"
             value={status}
             onChange={(e) => {
               setStatus(e.target.value as ReportStatus | 'ALL');
               resetPage();
             }}
-            sx={{ minWidth: 140 }}
+            sx={{ minWidth: 150 }}
           >
             {statusOptions.map((option) => (
               <MenuItem key={option} value={option}>
-                {option}
+                {option === 'ALL' ? 'Tümü' : statusLabel[option]}
               </MenuItem>
             ))}
           </TextField>
           <TextField
-            label="From"
+            label="Başlangıç"
             type="date"
             size="small"
             value={from}
@@ -159,7 +160,7 @@ export function ReportsPage() {
             slotProps={{ inputLabel: { shrink: true } }}
           />
           <TextField
-            label="To"
+            label="Bitiş"
             type="date"
             size="small"
             value={to}
@@ -179,7 +180,7 @@ export function ReportsPage() {
                 }}
               />
             }
-            label="Abnormal only"
+            label="Sadece anormal"
           />
           <FormControlLabel
             control={
@@ -191,7 +192,7 @@ export function ReportsPage() {
                 }}
               />
             }
-            label="Critical only"
+            label="Sadece kritik"
           />
         </Stack>
       </Paper>

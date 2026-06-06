@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 import { listAudit } from '../api/audit';
 import type { AuditEntry } from '../api/types';
+import { formatDateTime, outcomeLabel } from '../i18n/labels';
 
 export function AuditPage() {
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({ page: 0, pageSize: 25 });
@@ -21,28 +22,33 @@ export function AuditPage() {
   const columns: GridColDef<AuditEntry>[] = [
     {
       field: 'at',
-      headerName: 'Time',
+      headerName: 'Zaman',
       width: 190,
-      valueFormatter: (value) => (value ? new Date(value as string).toLocaleString() : ''),
+      valueFormatter: (value) => formatDateTime(value as string),
     },
-    { field: 'action', headerName: 'Action', width: 150 },
+    { field: 'action', headerName: 'İşlem', width: 160 },
     {
       field: 'outcome',
-      headerName: 'Outcome',
+      headerName: 'Sonuç',
       width: 120,
       renderCell: (params) => (
-        <Chip size="small" label={params.value} color={params.value === 'SUCCESS' ? 'success' : 'error'} variant="outlined" />
+        <Chip
+          size="small"
+          label={outcomeLabel(params.value as string)}
+          color={params.value === 'SUCCESS' ? 'success' : 'error'}
+          variant="outlined"
+        />
       ),
     },
-    { field: 'username', headerName: 'User', width: 120 },
-    { field: 'entityType', headerName: 'Entity', width: 110 },
-    { field: 'entityId', headerName: 'Entity id', flex: 1, minWidth: 180 },
+    { field: 'username', headerName: 'Kullanıcı', width: 120 },
+    { field: 'entityType', headerName: 'Varlık', width: 110 },
+    { field: 'entityId', headerName: 'Varlık no', flex: 1, minWidth: 180 },
     { field: 'ipAddress', headerName: 'IP', width: 130 },
   ];
 
   return (
     <Stack spacing={2}>
-      <Typography variant="h5">Audit log</Typography>
+      <Typography variant="h5">Denetim kaydı</Typography>
       <Paper sx={{ height: 600 }}>
         <DataGrid
           rows={query.data?.content ?? []}

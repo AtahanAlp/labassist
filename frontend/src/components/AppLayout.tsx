@@ -11,6 +11,7 @@ import ScienceIcon from '@mui/icons-material/Science';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../auth/useAuth';
+import { roleLabel } from '../i18n/labels';
 
 export function AppLayout() {
   const { user, logout } = useAuth();
@@ -18,11 +19,11 @@ export function AppLayout() {
   const location = useLocation();
 
   const navItems = [
-    { label: 'Reports', path: '/reports' },
+    { label: 'Raporlar', path: '/reports' },
     ...(user?.role === 'ADMIN'
       ? [
-          { label: 'Users', path: '/users' },
-          { label: 'Audit log', path: '/audit' },
+          { label: 'Kullanıcılar', path: '/users' },
+          { label: 'Denetim kaydı', path: '/audit' },
         ]
       : []),
   ];
@@ -65,12 +66,12 @@ export function AppLayout() {
           <Box sx={{ flexGrow: 1 }} />
           {user && (
             <>
-              <Chip size="small" label={user.role} sx={{ mr: 1 }} />
+              <Chip size="small" label={roleLabel[user.role]} sx={{ mr: 1 }} />
               <Typography variant="body2" sx={{ mr: 2 }}>
                 {user.displayName ?? user.username}
               </Typography>
               <Button color="inherit" size="small" startIcon={<LogoutIcon />} onClick={handleLogout}>
-                Log out
+                Çıkış
               </Button>
             </>
           )}

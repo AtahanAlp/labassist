@@ -16,6 +16,7 @@ import Alert from '@mui/material/Alert';
 import Chip from '@mui/material/Chip';
 import { listUsers, createUser } from '../api/users';
 import type { UserRole } from '../api/types';
+import { roleLabel } from '../i18n/labels';
 
 export function UsersPage() {
   const queryClient = useQueryClient();
@@ -39,17 +40,17 @@ export function UsersPage() {
 
   const errorMessage = mutation.isError
     ? axios.isAxiosError(mutation.error) && mutation.error.response?.status === 409
-      ? 'That username is already taken.'
-      : 'Could not create the account. The password must be at least 8 characters.'
+      ? 'Bu kullanıcı adı zaten alınmış.'
+      : 'Hesap oluşturulamadı. Şifre en az 8 karakter olmalı.'
     : null;
 
   return (
     <Stack spacing={2}>
-      <Typography variant="h5">Users</Typography>
+      <Typography variant="h5">Kullanıcılar</Typography>
 
       <Paper sx={{ p: 2.5 }}>
         <Typography variant="h6" sx={{ mb: 2 }}>
-          Create account
+          Hesap oluştur
         </Typography>
         <form
           onSubmit={(e) => {
@@ -58,32 +59,32 @@ export function UsersPage() {
           }}
         >
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'center' }} sx={{ flexWrap: 'wrap', rowGap: 2 }}>
-            <TextField label="Username" size="small" value={username} onChange={(e) => setUsername(e.target.value)} required />
-            <TextField label="Password" type="password" size="small" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            <TextField label="Display name" size="small" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-            <TextField select label="Role" size="small" value={role} onChange={(e) => setRole(e.target.value as UserRole)} sx={{ minWidth: 130 }}>
-              <MenuItem value="DOCTOR">DOCTOR</MenuItem>
-              <MenuItem value="ADMIN">ADMIN</MenuItem>
+            <TextField label="Kullanıcı adı" size="small" value={username} onChange={(e) => setUsername(e.target.value)} required />
+            <TextField label="Şifre" type="password" size="small" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <TextField label="Görünen ad" size="small" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+            <TextField select label="Rol" size="small" value={role} onChange={(e) => setRole(e.target.value as UserRole)} sx={{ minWidth: 130 }}>
+              <MenuItem value="DOCTOR">Doktor</MenuItem>
+              <MenuItem value="ADMIN">Yönetici</MenuItem>
             </TextField>
             <Button type="submit" variant="contained" disabled={mutation.isPending || !username || password.length < 8}>
-              {mutation.isPending ? 'Creating' : 'Create'}
+              {mutation.isPending ? 'Oluşturuluyor' : 'Oluştur'}
             </Button>
           </Stack>
         </form>
         {errorMessage && <Alert severity="error" sx={{ mt: 2 }}>{errorMessage}</Alert>}
-        {mutation.isSuccess && <Alert severity="success" sx={{ mt: 2 }}>Account created.</Alert>}
+        {mutation.isSuccess && <Alert severity="success" sx={{ mt: 2 }}>Hesap oluşturuldu.</Alert>}
       </Paper>
 
       <Paper sx={{ p: 0, overflow: 'hidden' }}>
         <Typography variant="h6" sx={{ p: 2, pb: 1 }}>
-          Accounts
+          Hesaplar
         </Typography>
         <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Username</TableCell>
-              <TableCell>Display name</TableCell>
-              <TableCell>Role</TableCell>
+              <TableCell>Kullanıcı adı</TableCell>
+              <TableCell>Görünen ad</TableCell>
+              <TableCell>Rol</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -92,7 +93,7 @@ export function UsersPage() {
                 <TableCell>{u.username}</TableCell>
                 <TableCell>{u.displayName ?? '-'}</TableCell>
                 <TableCell>
-                  <Chip size="small" label={u.role} variant="outlined" />
+                  <Chip size="small" label={roleLabel[u.role]} variant="outlined" />
                 </TableCell>
               </TableRow>
             ))}

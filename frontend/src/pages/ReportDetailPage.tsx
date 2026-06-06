@@ -18,6 +18,7 @@ import type { AnalyteFlag } from '../api/types';
 import { FlagChip } from '../components/FlagChip';
 import { StatusChip } from '../components/StatusChip';
 import { AiInterpretationPanel } from '../components/AiInterpretationPanel';
+import { formatDateTime, sexShort } from '../i18n/labels';
 
 const rowBg = (flag: AnalyteFlag) => {
   if (flag === 'CRITICAL_LOW' || flag === 'CRITICAL_HIGH') return 'rgba(198,40,40,0.08)';
@@ -52,19 +53,19 @@ export function ReportDetailPage() {
     );
   }
   if (isError || !report) {
-    return <Alert severity="error">Could not load this report.</Alert>;
+    return <Alert severity="error">Bu rapor yüklenemedi.</Alert>;
   }
 
   return (
     <Stack spacing={2}>
       <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/reports')} sx={{ alignSelf: 'flex-start' }}>
-        Back to reports
+        Raporlara dön
       </Button>
 
       <Paper sx={{ p: 2.5 }}>
         <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2 }}>
           <Typography variant="h5" sx={{ flexGrow: 1 }}>
-            {report.patientName ?? 'Unknown patient'}
+            {report.patientName ?? 'Bilinmeyen hasta'}
           </Typography>
           <StatusChip status={report.status} />
         </Stack>
@@ -75,21 +76,18 @@ export function ReportDetailPage() {
             gap: 2,
           }}
         >
-          <Field label="Report id" value={report.externalId} />
-          <Field label="MRN" value={report.patientMrn} />
-          <Field label="Age / Sex" value={`${report.patientAge ?? '?'} / ${report.patientSex ?? '?'}`} />
-          <Field label="Device" value={report.deviceId} />
-          <Field
-            label="Sample collected"
-            value={report.sampleCollectedAt ? new Date(report.sampleCollectedAt).toLocaleString() : '-'}
-          />
-          <Field label="Received" value={new Date(report.receivedAt).toLocaleString()} />
-          <Field label="Abnormal" value={report.abnormalCount} />
-          <Field label="Critical" value={report.criticalCount} />
+          <Field label="Rapor no" value={report.externalId} />
+          <Field label="Hasta no" value={report.patientMrn} />
+          <Field label="Yaş / Cinsiyet" value={`${report.patientAge ?? '?'} / ${sexShort(report.patientSex)}`} />
+          <Field label="Cihaz" value={report.deviceId} />
+          <Field label="Örnek alındı" value={formatDateTime(report.sampleCollectedAt)} />
+          <Field label="Alındı" value={formatDateTime(report.receivedAt)} />
+          <Field label="Anormal" value={report.abnormalCount} />
+          <Field label="Kritik" value={report.criticalCount} />
         </Box>
         {report.status === 'REJECTED' && report.rejectionReason && (
           <Alert severity="error" sx={{ mt: 2 }}>
-            Rejected during validation: {report.rejectionReason}
+            Doğrulama sırasında reddedildi: {report.rejectionReason}
           </Alert>
         )}
       </Paper>
@@ -97,17 +95,17 @@ export function ReportDetailPage() {
       {report.tests.length > 0 && (
         <Paper sx={{ p: 0, overflow: 'hidden' }}>
           <Typography variant="h6" sx={{ p: 2, pb: 1 }}>
-            Analytes
+            Analitler
           </Typography>
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Code</TableCell>
+                <TableCell>Kod</TableCell>
                 <TableCell>Test</TableCell>
-                <TableCell align="right">Value</TableCell>
-                <TableCell>Unit</TableCell>
-                <TableCell align="right">Reference range</TableCell>
-                <TableCell>Flag</TableCell>
+                <TableCell align="right">Değer</TableCell>
+                <TableCell>Birim</TableCell>
+                <TableCell align="right">Referans aralığı</TableCell>
+                <TableCell>Değerlendirme</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -116,11 +114,11 @@ export function ReportDetailPage() {
                   <TableCell>{test.code}</TableCell>
                   <TableCell>{test.name ?? '-'}</TableCell>
                   <TableCell align="right">
-                    <strong>{test.value ?? 'not measured'}</strong>
+                    <strong>{test.value ?? 'ölçülmedi'}</strong>
                   </TableCell>
                   <TableCell>{test.unit ?? ''}</TableCell>
                   <TableCell align="right">
-                    {test.refLow ?? '-'} to {test.refHigh ?? '-'}
+                    {test.refLow ?? '-'} - {test.refHigh ?? '-'}
                   </TableCell>
                   <TableCell>
                     <FlagChip flag={test.flag} />

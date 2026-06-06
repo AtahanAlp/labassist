@@ -26,7 +26,7 @@ export function LoginPage() {
       await login(username, password);
       navigate('/reports', { replace: true });
     } catch {
-      setError('Invalid username or password.');
+      setError('Kullanıcı adı veya şifre hatalı.');
     } finally {
       setSubmitting(false);
     }
@@ -40,34 +40,34 @@ export function LoginPage() {
           <Typography variant="h5">LabAssist</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Sign in to the Lab Results Smart Assistant.
+          Lab Sonuçları Akıllı Asistanı'na giriş yapın.
         </Typography>
 
         <form onSubmit={handleSubmit}>
           <Stack spacing={2}>
             {error && <Alert severity="error">{error}</Alert>}
             <TextField
-              label="Username"
+              label="Kullanıcı adı"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               autoFocus
               fullWidth
             />
             <TextField
-              label="Password"
+              label="Şifre"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
             />
             <Button type="submit" variant="contained" size="large" disabled={submitting || !password}>
-              {submitting ? 'Signing in' : 'Sign in'}
+              {submitting ? 'Giriş yapılıyor' : 'Giriş yap'}
             </Button>
           </Stack>
         </form>
 
         <Alert severity="info" sx={{ mt: 3 }}>
-          Demo accounts. Doctor: <strong>doctor / Doctor123!</strong>, admin:{' '}
+          Demo hesaplar. Doktor: <strong>doctor / Doctor123!</strong>, yönetici:{' '}
           <strong>admin / Admin123!</strong>
         </Alert>
       </Paper>
