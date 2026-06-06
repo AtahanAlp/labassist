@@ -40,7 +40,7 @@ export function UsersPage() {
   const errorMessage = mutation.isError
     ? axios.isAxiosError(mutation.error) && mutation.error.response?.status === 409
       ? 'That username is already taken.'
-      : 'Could not create the account (check the fields — password must be ≥ 8 characters).'
+      : 'Could not create the account. The password must be at least 8 characters.'
     : null;
 
   return (
@@ -66,7 +66,7 @@ export function UsersPage() {
               <MenuItem value="ADMIN">ADMIN</MenuItem>
             </TextField>
             <Button type="submit" variant="contained" disabled={mutation.isPending || !username || password.length < 8}>
-              {mutation.isPending ? 'Creating…' : 'Create'}
+              {mutation.isPending ? 'Creating' : 'Create'}
             </Button>
           </Stack>
         </form>
@@ -90,7 +90,7 @@ export function UsersPage() {
             {(usersQuery.data ?? []).map((u) => (
               <TableRow key={u.username}>
                 <TableCell>{u.username}</TableCell>
-                <TableCell>{u.displayName ?? '—'}</TableCell>
+                <TableCell>{u.displayName ?? '-'}</TableCell>
                 <TableCell>
                   <Chip size="small" label={u.role} variant="outlined" />
                 </TableCell>

@@ -40,11 +40,11 @@ export function AiInterpretationPanel({ reportId }: { reportId: string }) {
       </Stack>
 
       <Alert severity="info" sx={{ mb: 2 }}>
-        Preliminary, AI-generated decision support — <strong>not a diagnosis</strong>. A physician
-        must review and confirm.
+        This is a preliminary, AI-generated summary to support your review. It is{' '}
+        <strong>not a diagnosis</strong>, and a physician must confirm it.
         <Box component="span" sx={{ display: 'block', mt: 0.5 }}>
-          🔒 <strong>Privacy:</strong> only de-identified data (age, sex, analyte values, reference
-          ranges and flags) is sent to the AI — never the patient's name or MRN.
+          <strong>Privacy:</strong> only de-identified data (age, sex, analyte values, reference
+          ranges and flags) is sent to the model. The patient's name and MRN are never shared.
         </Box>
       </Alert>
 
@@ -58,7 +58,7 @@ export function AiInterpretationPanel({ reportId }: { reportId: string }) {
         <Stack direction="row" spacing={2} alignItems="center" sx={{ py: 3 }}>
           <CircularProgress size={22} />
           <Typography color="text.secondary">
-            Generating… inference runs locally on CPU and may take ~10–60 seconds.
+            Generating the interpretation. This runs locally and can take 10 to 60 seconds.
           </Typography>
         </Stack>
       )}

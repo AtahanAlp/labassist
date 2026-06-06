@@ -40,7 +40,7 @@ export function LoginPage() {
           <Typography variant="h5">LabAssist</Typography>
         </Stack>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          Lab Results Smart Assistant — sign in to continue
+          Sign in to the Lab Results Smart Assistant.
         </Typography>
 
         <form onSubmit={handleSubmit}>
@@ -61,13 +61,13 @@ export function LoginPage() {
               fullWidth
             />
             <Button type="submit" variant="contained" size="large" disabled={submitting || !password}>
-              {submitting ? 'Signing in…' : 'Sign in'}
+              {submitting ? 'Signing in' : 'Sign in'}
             </Button>
           </Stack>
         </form>
 
         <Alert severity="info" sx={{ mt: 3 }}>
-          Demo accounts — doctor: <strong>doctor / Doctor123!</strong>; admin:{' '}
+          Demo accounts. Doctor: <strong>doctor / Doctor123!</strong>, admin:{' '}
           <strong>admin / Admin123!</strong>
         </Alert>
       </Paper>

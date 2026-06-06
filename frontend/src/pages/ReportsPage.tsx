@@ -20,7 +20,7 @@ function StatCard({ label, value, color }: { label: string; value: number | unde
   return (
     <Paper sx={{ p: 2, flex: 1, minWidth: 120 }}>
       <Typography variant="h4" sx={{ color, fontWeight: 700 }}>
-        {value ?? '—'}
+        {value ?? '-'}
       </Typography>
       <Typography variant="body2" color="text.secondary">
         {label}
@@ -95,14 +95,14 @@ export function ReportsPage() {
         headerName: 'Abnormal',
         width: 110,
         renderCell: (params) =>
-          params.value > 0 ? <Chip size="small" color="warning" label={params.value} /> : <span>—</span>,
+          params.value > 0 ? <Chip size="small" color="warning" label={params.value} /> : <span>-</span>,
       },
       {
         field: 'criticalCount',
         headerName: 'Critical',
         width: 100,
         renderCell: (params) =>
-          params.value > 0 ? <Chip size="small" color="error" label={params.value} /> : <span>—</span>,
+          params.value > 0 ? <Chip size="small" color="error" label={params.value} /> : <span>-</span>,
       },
     ],
     [],

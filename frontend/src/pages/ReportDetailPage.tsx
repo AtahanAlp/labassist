@@ -31,7 +31,7 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
       <Typography variant="caption" color="text.secondary">
         {label}
       </Typography>
-      <Typography variant="body2">{value ?? '—'}</Typography>
+      <Typography variant="body2">{value ?? '-'}</Typography>
     </Box>
   );
 }
@@ -81,7 +81,7 @@ export function ReportDetailPage() {
           <Field label="Device" value={report.deviceId} />
           <Field
             label="Sample collected"
-            value={report.sampleCollectedAt ? new Date(report.sampleCollectedAt).toLocaleString() : '—'}
+            value={report.sampleCollectedAt ? new Date(report.sampleCollectedAt).toLocaleString() : '-'}
           />
           <Field label="Received" value={new Date(report.receivedAt).toLocaleString()} />
           <Field label="Abnormal" value={report.abnormalCount} />
@@ -114,13 +114,13 @@ export function ReportDetailPage() {
               {report.tests.map((test) => (
                 <TableRow key={test.code} sx={{ bgcolor: rowBg(test.flag) }}>
                   <TableCell>{test.code}</TableCell>
-                  <TableCell>{test.name ?? '—'}</TableCell>
+                  <TableCell>{test.name ?? '-'}</TableCell>
                   <TableCell align="right">
                     <strong>{test.value ?? 'not measured'}</strong>
                   </TableCell>
                   <TableCell>{test.unit ?? ''}</TableCell>
                   <TableCell align="right">
-                    {test.refLow ?? '—'} – {test.refHigh ?? '—'}
+                    {test.refLow ?? '-'} to {test.refHigh ?? '-'}
                   </TableCell>
                   <TableCell>
                     <FlagChip flag={test.flag} />
