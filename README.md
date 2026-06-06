@@ -20,9 +20,6 @@ password login, encryption of patient data, and an audit trail.
 | `db` | PostgreSQL 16 + Flyway | Persistence + reproducible schema/seed |
 | `llm` | Ollama (qwen2.5:3b) | Local, CPU-friendly preliminary interpretation |
 
-More detail in [`docs/architecture.md`](docs/architecture.md) and the step-by-step
-[`docs/usage-guide.md`](docs/usage-guide.md).
-
 ---
 
 ## Start with the usage guide
@@ -134,7 +131,7 @@ All endpoints except login and Swagger require `Authorization: Bearer <jwt>`.
   (validate → flag → encrypt → persist, incl. critical / partial / malformed / duplicate and
   PII-ciphertext-at-rest), and the API/security/LLM endpoints over MockMvc (Ollama mocked).
 
-`cd backend && ./mvnw test` → 32 tests, all green.
+`cd backend && ./mvnw test` → 34 tests, all green.
 
 ---
 
