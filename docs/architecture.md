@@ -19,12 +19,12 @@
   └──────────────────┘                                     │  PostgreSQL (Flyway)      │
                                                            │       ▲                   │
   ┌──────────────────┐     REST + JWT (Bearer)             │       │                   │
-  │     frontend     │  ◀───────────────────────────────▶ │  REST controllers         │
+  │     frontend     │  ◀───────────────────────────────▶│  REST controllers         │
   │  (React + MUI)   │     login · list · detail · AI      │   auth · reports · audit  │
   └──────────────────┘                                     │   llm                     │
                                                            │       │ prompt (no PII)   │
                                                            │       ▼                   │
-                                                           │  Ollama (llama3.2:3b)     │
+                                                           │  Ollama (qwen2.5:3b)      │
                                                            └───────────────────────────┘
 ```
 

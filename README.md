@@ -23,7 +23,7 @@ password login, encryption of patient data, and an audit trail.
                                      └─────────┬───────────┘                └────────────────┘
                                                │  prompt (no PII)
                                      ┌─────────▼───────────┐     ┌──────────────┐
-                                     │  Ollama llama3.2:3b  │     │  PostgreSQL  │
+                                     │  Ollama qwen2.5:3b  │     │  PostgreSQL  │
                                      └──────────────────────┘     └──────────────┘
 ```
 
@@ -31,9 +31,9 @@ password login, encryption of patient data, and an audit trail.
 |---|---|---|
 | `mock-lab-device/` | Node/Express + TypeScript | Simulates a lab analyzer; emits JSON results across many scenarios |
 | `backend/` | Spring Boot 3.5 (Java 17, Maven) | Polls, validates, flags, encrypts, stores, serves the REST API, calls the LLM, audits |
-| `frontend/` | React 18 + Vite + TypeScript + MUI | Doctor login, result list with abnormal highlighting, detail view, AI interpretation |
+| `frontend/` | React 18 + Vite + TypeScript + MUI | **Turkish** doctor dashboard: login, result list with abnormal highlighting, detail view, AI interpretation |
 | `db` | PostgreSQL 16 + Flyway | Persistence + reproducible schema/seed |
-| `llm` | Ollama (llama3.2:3b) | Local, CPU-friendly preliminary interpretation |
+| `llm` | Ollama (qwen2.5:3b) | Local, CPU-friendly preliminary interpretation |
 
 More detail in [`docs/architecture.md`](docs/architecture.md) and the step-by-step
 [`docs/usage-guide.md`](docs/usage-guide.md).
@@ -42,7 +42,7 @@ More detail in [`docs/architecture.md`](docs/architecture.md) and the step-by-st
 
 ## Quick start (Docker — one command)
 
-> Prerequisites: Docker + Docker Compose. The first run downloads the **~2 GB** `llama3.2:3b`
+> Prerequisites: Docker + Docker Compose. The first run downloads the **~2 GB** `qwen2.5:3b`
 > model into a named volume (subsequent runs reuse it).
 
 ```bash
@@ -79,7 +79,7 @@ Run the infrastructure in Docker and the apps natively for fast iteration:
 ```bash
 # 1) Infra
 docker compose up -d postgres ollama
-docker compose exec ollama ollama pull llama3.2:3b   # once
+docker compose exec ollama ollama pull qwen2.5:3b   # once
 
 # 2) Mock device  (http://localhost:9090)
 cd mock-lab-device && npm install && npm run dev
@@ -133,9 +133,14 @@ All endpoints except login and Swagger require `Authorization: Bearer <jwt>`.
   X-Data-Grid 7** instead of the just-released MUI 9.
 - **Java 17 + Maven wrapper**, **Vite + TypeScript**, **PostgreSQL + Flyway** — standard,
   reproducible, enterprise-familiar. Flyway owns the schema; JPA runs in `validate` mode.
-- **Ollama + `llama3.2:3b`.** Local, free, fully reproducible, and small enough to run on a
-  CPU-only box (~2 GB). Trade-off: a 3B model favors latency/footprint over depth — acceptable
-  for *preliminary* commentary. Swappable via `OLLAMA_MODEL`.
+- **Ollama + `qwen2.5:3b`.** Local, free, fully reproducible, and small enough to run on a
+  CPU-only box (~2 GB). Chosen over llama3.2:3b specifically for its **stronger Turkish** (the AI
+  commentary is shown to Turkish clinicians). Trade-off: a 3B model favors latency/footprint over
+  depth — acceptable for *preliminary* commentary. Swappable via `OLLAMA_MODEL`.
+- **Turkish doctor UI.** LabAssist is a tool for a Turkish hospital, so the doctor-facing UI and the
+  AI interpretation are in **Turkish** (dates in `tr-TR`, Turkish patient names). Code, API, database
+  schema and Git history stay in **English** — the engineering standard. This is a UI-layer
+  localization, not a codebase one.
 - **Node/Express mock** as a *separate* service — it represents an external analyzer the backend
   polls over HTTP, so a distinct process (and stack) keeps that boundary honest and makes
   scenario authoring easy.

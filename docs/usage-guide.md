@@ -2,6 +2,9 @@
 
 A step-by-step walkthrough of the doctor's workflow. All data is synthetic.
 
+> The running UI is in **Turkish** (LabAssist is a tool for a Turkish hospital). This guide is in
+> English; the screenshots show the actual Turkish interface.
+
 ## 0. Start the system
 
 ```bash
