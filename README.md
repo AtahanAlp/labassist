@@ -110,11 +110,16 @@ All endpoints except login and Swagger require `Authorization: Bearer <jwt>`.
 |---|---|---|
 | POST | `/api/auth/login` | Authenticate, receive a JWT |
 | GET | `/api/auth/me` | Current user |
-| GET | `/api/lab-reports` | Paged list; filters: `abnormalOnly`, `status`, `q` (report id) |
+| GET | `/api/lab-reports` | Paged list; filters: `abnormalOnly`, `criticalOnly`, `status`, `q` (report id), `from`/`to` (date) |
+| GET | `/api/lab-reports/summary` | Dashboard counts (scoped to the caller's visibility) |
 | GET | `/api/lab-reports/{id}` | Report detail with analytes + flags (PII decrypted) |
 | POST | `/api/lab-reports/{id}/interpretation` | Generate (or return cached) AI interpretation; `?refresh=true` to regenerate |
 | GET | `/api/lab-reports/{id}/interpretation` | Latest stored interpretation (204 if none) |
+| GET / POST | `/api/users` | List / create accounts — **ADMIN only** |
 | GET | `/api/audit` | Audit trail — **ADMIN only** |
+
+> **Visibility:** doctors see only clinically-valid reports (`VALIDATED`/`PARTIAL`); `REJECTED`
+> (malformed) reports are a data-quality concern visible to **admins** only.
 
 ---
 
@@ -167,8 +172,11 @@ All endpoints except login and Swagger require `Authorization: Bearer <jwt>`.
   **AES-256-GCM** (authenticated) via a JPA `AttributeConverter`; ciphertext in the DB, transparent
   decryption only for authorized API responses. Verified at-rest in an integration test.
 - **Audit trail in a dedicated `audit_log` table** (the brief's "logging system"): login
-  success/failure, ingestion polls, report views and LLM requests — with an admin viewer. Audit
-  writes use `REQUIRES_NEW` so they persist independently of the business transaction.
+  success/failure, ingestion polls, report views, LLM requests and account creation — with an admin
+  viewer. Audit writes use `REQUIRES_NEW` so they persist independently of the business transaction.
+- **Role-scoped visibility & provisioning.** Doctors see only clinically-valid reports; malformed
+  `REJECTED` ones are admin-only (a data-quality concern). There is **no public signup** — accounts
+  are provisioned by an admin (`/api/users`), which fits a clinical system.
 
 **LLM endpoint**
 

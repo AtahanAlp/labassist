@@ -26,15 +26,21 @@ trail.
 
 ## 2. Review the report list
 
-The dashboard lists reports newest-first with server-side pagination. You can:
+The dashboard opens with **summary cards** (total reports, how many carry abnormal values, how many
+carry critical values) above a server-paginated table. You can filter by:
 
-- toggle **Abnormal only**,
-- filter by **Status** (`VALIDATED` / `PARTIAL` / `REJECTED`),
-- search by **report id**.
+- **Abnormal only** / **Critical only** toggles,
+- **Status** (`VALIDATED` / `PARTIAL`),
+- **received-date range** (From / To),
+- **report id** search.
 
 Abnormal rows are tinted amber, **critical** rows red, and per-row chips show the abnormal/critical
 counts. Patient names shown here are decrypted on the fly for the authenticated doctor (they are
 ciphertext at rest in the database).
+
+> Doctors see only clinically-valid reports. Malformed/`REJECTED` device messages are a
+> data-quality concern shown to **admins** only (admins also get a "Rejected" summary card and the
+> `REJECTED` status filter).
 
 ![Reports list](screenshots/02-reports.png)
 
@@ -63,6 +69,14 @@ Sign in as `admin` and open **Audit log** to see who did what and when — login
 report views and LLM requests.
 
 ![Audit log](screenshots/05-audit.png)
+
+## 6. Manage accounts (admin)
+
+There is no public sign-up (appropriate for a clinical system). An admin provisions accounts under
+**Users** — fill in username, password, optional display name and role, then **Create**. New
+accounts appear in the list and the action is recorded in the audit log.
+
+![Users](screenshots/06-users.png)
 
 ## Seeing the different ingestion scenarios
 
