@@ -1,0 +1,31 @@
+# ---- Secrets / env ----
+.env
+.env.local
+*.local
+
+# ---- Java / Maven (backend) ----
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+hs_err_pid*
+
+# ---- Node (mock-lab-device, frontend) ----
+node_modules/
+dist/
+build/
+.vite/
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+coverage/
+
+# ---- IDE / OS ----
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# ---- Docker ----
+*.pid

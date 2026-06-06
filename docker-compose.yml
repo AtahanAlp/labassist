@@ -1,0 +1,103 @@
+# ============================================================================
+# LabAssist — full stack in one command:  docker compose up --build
+# Services: postgres · ollama (+ one-shot model pull) · mock-lab-device · backend · frontend
+# ============================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-labassist}
+      POSTGRES_USER: ${POSTGRES_USER:-labassist}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-labassist_pw}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-labassist} -d ${POSTGRES_DB:-labassist}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # One-shot init container: pulls the model, then exits 0.
+  ollama-init:
+    image: ollama/ollama:latest
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
+    entrypoint: ["/bin/sh", "-c", "ollama pull $${OLLAMA_MODEL}"]
+    restart: "no"
+
+  mock-lab-device:
+    build: ./mock-lab-device
+    environment:
+      MOCK_DEVICE_PORT: ${MOCK_DEVICE_PORT:-9090}
+    ports:
+      - "${MOCK_DEVICE_PORT:-9090}:9090"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9090/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mock-lab-device:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-labassist}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-labassist}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-labassist_pw}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-60}
+      PII_ENCRYPTION_KEY: ${PII_ENCRYPTION_KEY}
+      SEED_DOCTOR_USERNAME: ${SEED_DOCTOR_USERNAME:-doctor}
+      SEED_DOCTOR_PASSWORD: ${SEED_DOCTOR_PASSWORD:-Doctor123!}
+      LAB_DEVICE_BASE_URL: http://mock-lab-device:9090
+      INGESTION_POLL_INTERVAL_MS: ${INGESTION_POLL_INTERVAL_MS:-5000}
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
+      OLLAMA_TIMEOUT_SECONDS: ${OLLAMA_TIMEOUT_SECONDS:-120}
+      APP_CORS_ALLOWED_ORIGINS: http://localhost:${FRONTEND_PORT:-5173}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:${BACKEND_PORT:-8080}
+    depends_on:
+      - backend
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+
+volumes:
+  pgdata:
+  ollama:
