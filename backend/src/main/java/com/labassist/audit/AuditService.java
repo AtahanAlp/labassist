@@ -48,11 +48,13 @@ public class AuditService {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void success(AuditAction action, String username, String entityType, String entityId,
                         Map<String, Object> details, String ipAddress) {
         record(action, AuditOutcome.SUCCESS, username, entityType, entityId, details, ipAddress);
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void failure(AuditAction action, String username, String entityType, String entityId,
                         Map<String, Object> details, String ipAddress) {
         record(action, AuditOutcome.FAILURE, username, entityType, entityId, details, ipAddress);

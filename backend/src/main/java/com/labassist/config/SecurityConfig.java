@@ -1,6 +1,7 @@
 package com.labassist.config;
 
 import com.labassist.security.JwtAuthenticationFilter;
+import com.labassist.security.RestAccessDeniedHandler;
 import com.labassist.security.RestAuthenticationEntryPoint;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -38,6 +39,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtAuthenticationFilter jwtAuthenticationFilter,
                                                    RestAuthenticationEntryPoint authenticationEntryPoint,
+                                                   RestAccessDeniedHandler accessDeniedHandler,
                                                    CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
@@ -47,7 +49,9 @@ public class SecurityConfig {
                         .requestMatchers(PUBLIC_PATHS).permitAll()
                         .requestMatchers("/api/audit/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
-                .exceptionHandling(eh -> eh.authenticationEntryPoint(authenticationEntryPoint))
+                .exceptionHandling(eh -> eh
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
