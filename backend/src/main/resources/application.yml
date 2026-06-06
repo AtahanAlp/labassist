@@ -41,6 +41,7 @@ labassist:
     base-url: ${LAB_DEVICE_BASE_URL:http://localhost:9090}
     poll-interval-ms: ${INGESTION_POLL_INTERVAL_MS:5000}
     request-timeout-ms: 8000
+    polling-enabled: ${INGESTION_POLLING_ENABLED:true}
   ollama:
     base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
     model: ${OLLAMA_MODEL:llama3.2:3b}
