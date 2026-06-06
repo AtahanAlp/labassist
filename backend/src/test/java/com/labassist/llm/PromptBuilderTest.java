@@ -36,8 +36,8 @@ class PromptBuilderTest {
     void userPromptIncludesDeidentifiedClinicalData() {
         String prompt = promptBuilder.buildUserPrompt(sampleReport());
 
-        assertThat(prompt).contains("64").contains("F");
-        assertThat(prompt).contains("Potassium").contains("6.9").contains("CRITICAL_HIGH");
+        assertThat(prompt).contains("64").contains("kadın"); // sex F rendered in Turkish
+        assertThat(prompt).contains("Potassium").contains("6.9").contains("Kritik Yüksek");
     }
 
     @Test
@@ -49,9 +49,10 @@ class PromptBuilderTest {
     }
 
     @Test
-    void systemPromptEnforcesNonDiagnosticFraming() {
+    void systemPromptEnforcesNonDiagnosticTurkishFraming() {
         assertThat(promptBuilder.buildSystemPrompt())
-                .containsIgnoringCase("non-diagnostic")
-                .containsIgnoringCase("physician");
+                .containsIgnoringCase("tanı")   // non-diagnostic framing
+                .containsIgnoringCase("hekim")  // physician review
+                .containsIgnoringCase("TÜRKÇE");
     }
 }
