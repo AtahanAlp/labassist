@@ -116,7 +116,8 @@ export class Generator {
 
   private round(value: number, decimals: number): number {
     const f = 10 ** decimals;
-    return Math.round(value * f) / f;
+    // Clamp to >= 0: no analyte in the catalog can be physiologically negative.
+    return Math.max(0, Math.round(value * f) / f);
   }
 
   private valueInRange(a: Analyte): number {
