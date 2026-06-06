@@ -15,6 +15,9 @@ docker compose up --build
 Wait until the backend is healthy (the first run also pulls the ~2 GB LLM model), then open
 **<http://localhost:5173>**.
 
+The mock emits a new report roughly every 20 seconds, so the list grows over time. To wipe the
+accumulated data and the cached model and start fresh, run `docker compose down -v`.
+
 ## 1. Sign in
 
 Log in with a seeded account (shown on the login screen):

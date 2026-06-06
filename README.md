@@ -38,31 +38,6 @@ For a quick evaluation walkthrough, please start with the step-by-step
 
 ---
 
-## Quick start (Docker — one command)
-
-Prerequisites: Docker + Docker Compose. The first run downloads the **~2 GB** `qwen2.5:3b` model into a named volume (subsequent runs reuse it).
-
-```bash
-cp .env.example .env          # secrets for JWT signing + PII encryption (already filled with dev values)
-docker compose up --build     # postgres · ollama (+model pull) · mock · backend · frontend
-```
-
-Then open **<http://localhost:5173>** and sign in with a seeded account:
-
-| Role | Username | Password |
-|---|---|---|
-| Doctor | `doctor` | `Doctor123!` |
-| Admin (also sees the audit log) | `admin` | `Admin123!` |
-
-The mock emits a new report every ~20 s (configurable via `MOCK_EMIT_INTERVAL_MS`), so the list
-grows over time. To wipe accumulated data (and the model cache) and start fresh:
-
-```bash
-docker compose down -v
-```
-
----
-
 ## REST API (overview)
 
 All endpoints except login and Swagger require `Authorization: Bearer <jwt>`.
@@ -146,8 +121,6 @@ All endpoints except login and Swagger require `Authorization: Bearer <jwt>`.
 - **Searchable encrypted fields** — because name/MRN are encrypted at rest, free-text search is by report id only. A blind index would enable encrypted-field search at the cost of complexity.
 - **Frontend test suite** — testing effort was concentrated on the backend (where the business
   logic lives); only high-value paths are covered.
-- **Real device protocol** — the mock speaks JSON; a production integration would
-  parse the real wire format.
 - **Queue-based ingestion (e.g. Kafka)** — a single scheduled poller is
   sufficient at this scale.
 
