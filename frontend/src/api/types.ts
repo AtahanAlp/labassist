@@ -71,6 +71,14 @@ export interface LlmInterpretation {
   errorMessage: string | null;
 }
 
+export interface ReportSummary {
+  total: number;
+  abnormal: number;
+  critical: number;
+  partial: number;
+  rejected: number;
+}
+
 export interface AuditEntry {
   id: string;
   at: string;

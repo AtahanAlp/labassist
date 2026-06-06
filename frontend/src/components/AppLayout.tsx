@@ -32,9 +32,14 @@ export function AppLayout() {
             LabAssist
           </Typography>
           {user?.role === 'ADMIN' && (
-            <Button color="inherit" size="small" onClick={() => navigate('/audit')}>
-              Audit log
-            </Button>
+            <>
+              <Button color="inherit" size="small" onClick={() => navigate('/users')}>
+                Users
+              </Button>
+              <Button color="inherit" size="small" onClick={() => navigate('/audit')}>
+                Audit log
+              </Button>
+            </>
           )}
           <Box sx={{ flexGrow: 1 }} />
           {user && (

@@ -5,19 +5,26 @@ import type {
   LlmInterpretation,
   PagedResponse,
   ReportStatus,
+  ReportSummary,
 } from './types';
 
 export interface ReportQuery {
   page?: number;
   size?: number;
   abnormalOnly?: boolean;
+  criticalOnly?: boolean;
   status?: ReportStatus;
   q?: string;
+  from?: string; // yyyy-MM-dd
+  to?: string; // yyyy-MM-dd
   sort?: string;
 }
 
 export const listReports = (params: ReportQuery) =>
   api.get<PagedResponse<LabReportSummary>>('/api/lab-reports', { params }).then((r) => r.data);
+
+export const getReportsSummary = () =>
+  api.get<ReportSummary>('/api/lab-reports/summary').then((r) => r.data);
 
 export const getReport = (id: string) =>
   api.get<LabReportDetail>(`/api/lab-reports/${id}`).then((r) => r.data);
