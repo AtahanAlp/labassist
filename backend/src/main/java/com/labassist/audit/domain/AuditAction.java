@@ -7,5 +7,6 @@ public enum AuditAction {
     INGEST_POLL,
     REPORT_LIST,
     REPORT_VIEW,
-    LLM_INTERPRET
+    LLM_INTERPRET,
+    USER_CREATE
 }

@@ -68,6 +68,15 @@ class LabAssistApiIntegrationTest {
         return reportRepository.findAll().get(0).getId();
     }
 
+    /** Ingests a malformed message (no externalId) → stored as REJECTED. */
+    private void seedRejected() {
+        Map<String, Object> patient = Map.of("name", "X", "mrn", "Y", "age", 50, "sex", "M");
+        Map<String, Object> test = Map.of("code", "K", "name", "Potassium", "value", 4.0, "unit", "mmol/L");
+        Map<String, Object> message = Map.of("deviceId", "ANALYZER-TEST", "patient", patient,
+                "sampleCollectedAt", "2026-06-06T08:00:00Z", "tests", List.of(test));
+        messageIngestor.ingest(objectMapper.valueToTree(message));
+    }
+
     @Test
     void listRequiresAuthentication() throws Exception {
         mockMvc.perform(get("/api/lab-reports")).andExpect(status().isUnauthorized());
@@ -106,6 +115,49 @@ class LabAssistApiIntegrationTest {
     void adminCanReadAuditLog() throws Exception {
         mockMvc.perform(get("/api/audit").header("Authorization", "Bearer " + login("admin", "Admin123!")))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void doctorListExcludesRejectedButAdminSeesIt() throws Exception {
+        seedReport("OK-1", "Valid Patient"); // VALIDATED
+        seedRejected();                      // REJECTED
+
+        mockMvc.perform(get("/api/lab-reports").header("Authorization", "Bearer " + login("doctor", "Doctor123!")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1));
+
+        mockMvc.perform(get("/api/lab-reports").header("Authorization", "Bearer " + login("admin", "Admin123!")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(2));
+    }
+
+    @Test
+    void summaryReturnsScopedCounts() throws Exception {
+        seedReport("S-1", "Patient");
+        mockMvc.perform(get("/api/lab-reports/summary").header("Authorization", "Bearer " + login("doctor", "Doctor123!")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(1));
+    }
+
+    @Test
+    void adminCanCreateUserButDoctorCannot() throws Exception {
+        String newUser = "{\"username\":\"nurse1\",\"password\":\"Password123\",\"displayName\":\"Nurse\",\"role\":\"DOCTOR\"}";
+
+        mockMvc.perform(post("/api/users").header("Authorization", "Bearer " + login("doctor", "Doctor123!"))
+                        .contentType(MediaType.APPLICATION_JSON).content(newUser))
+                .andExpect(status().isForbidden());
+
+        String adminToken = login("admin", "Admin123!");
+        mockMvc.perform(post("/api/users").header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON).content(newUser))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.username").value("nurse1"))
+                .andExpect(jsonPath("$.role").value("DOCTOR"));
+
+        // Duplicate username -> 409
+        mockMvc.perform(post("/api/users").header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON).content(newUser))
+                .andExpect(status().isConflict());
     }
 
     @Test

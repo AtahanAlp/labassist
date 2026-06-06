@@ -1,5 +1,6 @@
 package com.labassist.common.web;
 
+import com.labassist.common.exception.ConflictException;
 import com.labassist.common.exception.LlmUnavailableException;
 import com.labassist.common.exception.NotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +41,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleNotFound(NotFoundException ex, HttpServletRequest request) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ApiError.of(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI()));
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiError> handleConflict(ConflictException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiError.of(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI()));
     }
 
     @ExceptionHandler(LlmUnavailableException.class)
