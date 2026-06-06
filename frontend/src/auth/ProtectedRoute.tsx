@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from './AuthContext';
+import { useAuth } from './useAuth';
 
 /** Gate for authenticated routes; redirects to /login when there is no session. */
 export function ProtectedRoute() {

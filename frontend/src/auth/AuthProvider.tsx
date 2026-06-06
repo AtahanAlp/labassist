@@ -1,18 +1,11 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { setUnauthorizedHandler, tokenStore } from '../api/client';
 import { login as apiLogin } from '../api/auth';
 import type { UserInfo } from '../api/types';
+import { AuthContext } from './useAuth';
 
 const USER_KEY = 'labassist_user';
-
-interface AuthContextValue {
-  user: UserInfo | null;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
-}
-
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 function loadStoredUser(): UserInfo | null {
   const raw = localStorage.getItem(USER_KEY);
@@ -45,12 +38,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(() => ({ user, login, logout: clearSession }), [user, login, clearSession]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext);
-  if (!ctx) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return ctx;
 }

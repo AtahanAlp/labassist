@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import axios from 'axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
@@ -37,10 +38,9 @@ export function UsersPage() {
   });
 
   const errorMessage = mutation.isError
-    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ((mutation.error as any)?.response?.status === 409
-        ? 'That username is already taken.'
-        : 'Could not create the account (check the fields — password must be ≥ 8 characters).')
+    ? axios.isAxiosError(mutation.error) && mutation.error.response?.status === 409
+      ? 'That username is already taken.'
+      : 'Could not create the account (check the fields — password must be ≥ 8 characters).'
     : null;
 
   return (

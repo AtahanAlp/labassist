@@ -41,7 +41,11 @@ export function AiInterpretationPanel({ reportId }: { reportId: string }) {
 
       <Alert severity="info" sx={{ mb: 2 }}>
         Preliminary, AI-generated decision support — <strong>not a diagnosis</strong>. A physician
-        must review and confirm. Patient identifiers are never sent to the AI model.
+        must review and confirm.
+        <Box component="span" sx={{ display: 'block', mt: 0.5 }}>
+          🔒 <strong>Privacy:</strong> only de-identified data (age, sex, analyte values, reference
+          ranges and flags) is sent to the AI — never the patient's name or MRN.
+        </Box>
       </Alert>
 
       {mutation.isError && (

@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 import ScienceIcon from '@mui/icons-material/Science';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../auth/useAuth';
 
 export function LoginPage() {
   const { login } = useAuth();

@@ -5,14 +5,33 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Chip from '@mui/material/Chip';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import ScienceIcon from '@mui/icons-material/Science';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth/AuthContext';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../auth/useAuth';
 
 export function AppLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const navItems = [
+    { label: 'Reports', path: '/reports' },
+    ...(user?.role === 'ADMIN'
+      ? [
+          { label: 'Users', path: '/users' },
+          { label: 'Audit log', path: '/audit' },
+        ]
+      : []),
+  ];
+
+  // Keep "Reports" active on the detail route too.
+  const activeItem =
+    navItems.find((item) =>
+      item.path === '/reports' ? location.pathname.startsWith('/reports') : location.pathname === item.path,
+    )?.path ?? false;
 
   const handleLogout = () => {
     logout();
@@ -22,25 +41,27 @@ export function AppLayout() {
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
       <AppBar position="sticky" color="default">
-        <Toolbar>
-          <ScienceIcon color="primary" sx={{ mr: 1 }} />
-          <Typography
-            variant="h6"
-            sx={{ cursor: 'pointer', mr: 2 }}
+        <Toolbar sx={{ gap: 2 }}>
+          <Box
+            sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}
             onClick={() => navigate('/reports')}
           >
-            LabAssist
-          </Typography>
-          {user?.role === 'ADMIN' && (
-            <>
-              <Button color="inherit" size="small" onClick={() => navigate('/users')}>
-                Users
-              </Button>
-              <Button color="inherit" size="small" onClick={() => navigate('/audit')}>
-                Audit log
-              </Button>
-            </>
-          )}
+            <ScienceIcon color="primary" sx={{ mr: 1 }} />
+            <Typography variant="h6">LabAssist</Typography>
+          </Box>
+
+          <Tabs
+            value={activeItem}
+            onChange={(_, value) => navigate(value)}
+            textColor="primary"
+            indicatorColor="primary"
+            sx={{ minHeight: 64, '& .MuiTab-root': { minHeight: 64, fontWeight: 600 } }}
+          >
+            {navItems.map((item) => (
+              <Tab key={item.path} label={item.label} value={item.path} />
+            ))}
+          </Tabs>
+
           <Box sx={{ flexGrow: 1 }} />
           {user && (
             <>

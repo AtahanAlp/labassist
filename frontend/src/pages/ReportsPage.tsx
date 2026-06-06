@@ -14,7 +14,7 @@ import Chip from '@mui/material/Chip';
 import { listReports, getReportsSummary } from '../api/reports';
 import type { LabReportSummary, ReportStatus } from '../api/types';
 import { StatusChip } from '../components/StatusChip';
-import { useAuth } from '../auth/AuthContext';
+import { useAuth } from '../auth/useAuth';
 
 function StatCard({ label, value, color }: { label: string; value: number | undefined; color?: string }) {
   return (
