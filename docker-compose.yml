@@ -48,6 +48,7 @@ services:
     build: ./mock-lab-device
     environment:
       MOCK_DEVICE_PORT: ${MOCK_DEVICE_PORT:-9090}
+      MOCK_EMIT_INTERVAL_MS: ${MOCK_EMIT_INTERVAL_MS:-20000}
     ports:
       - "${MOCK_DEVICE_PORT:-9090}:9090"
     healthcheck:

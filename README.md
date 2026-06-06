@@ -63,6 +63,13 @@ Interactive API docs (Swagger UI): **<http://localhost:8080/swagger-ui.html>**.
 > ⏱️ The LLM runs on CPU here (no GPU), so the **first** interpretation for a report takes
 > ~30–60 s; the result is cached, so re-opening it is instant.
 
+The mock emits a new report every ~20 s (configurable via `MOCK_EMIT_INTERVAL_MS`), so the list
+grows over time. To wipe accumulated data (and the model cache) and start fresh:
+
+```bash
+docker compose down -v
+```
+
 ---
 
 ## Local development workflow

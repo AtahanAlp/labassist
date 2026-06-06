@@ -30,7 +30,7 @@ export const config: Config = {
   port: num('MOCK_DEVICE_PORT', 9090),
   deviceId: process.env.MOCK_DEVICE_ID ?? 'ANALYZER-A1',
   seed: num('MOCK_DEVICE_SEED', 20240601),
-  emitIntervalMs: num('MOCK_EMIT_INTERVAL_MS', 4000),
+  emitIntervalMs: num('MOCK_EMIT_INTERVAL_MS', 20000),
   initialReports: num('MOCK_INITIAL_REPORTS', 8),
   chaosDelayRate: num('MOCK_CHAOS_DELAY_RATE', 0.1),
   chaosErrorRate: num('MOCK_CHAOS_ERROR_RATE', 0.05),
