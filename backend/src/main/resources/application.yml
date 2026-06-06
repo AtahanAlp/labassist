@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: labassist-backend
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/labassist}
+    username: ${SPRING_DATASOURCE_USERNAME:labassist}
+    password: ${SPRING_DATASOURCE_PASSWORD:labassist_pw}
+  jpa:
+    hibernate:
+      ddl-auto: validate          # Flyway owns the schema; Hibernate only validates the mapping
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        # Map java.time.Instant to TIMESTAMP WITH TIME ZONE so it lines up with timestamptz columns
+        type:
+          preferred_instant_jdbc_type: TIMESTAMP_WITH_TIMEZONE
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+server:
+  port: ${BACKEND_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+
+labassist:
+  lab-device:
+    base-url: ${LAB_DEVICE_BASE_URL:http://localhost:9090}
+    poll-interval-ms: ${INGESTION_POLL_INTERVAL_MS:5000}
+    request-timeout-ms: 8000
+  ollama:
+    base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+    model: ${OLLAMA_MODEL:llama3.2:3b}
+    timeout-seconds: ${OLLAMA_TIMEOUT_SECONDS:120}
+    temperature: 0.2
+  security:
+    jwt:
+      secret: ${JWT_SECRET:dev-only-change-me-jwt-signing-secret-min-32-bytes-aaaa}
+      expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+    cors:
+      allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:5173}
+    seed:
+      doctor-username: ${SEED_DOCTOR_USERNAME:doctor}
+      doctor-password: ${SEED_DOCTOR_PASSWORD:Doctor123!}
+      doctor-display-name: "Dr. Demo"
+      admin-username: ${SEED_ADMIN_USERNAME:admin}
+      admin-password: ${SEED_ADMIN_PASSWORD:Admin123!}
+      admin-display-name: "System Admin"
+  crypto:
+    pii-key: ${PII_ENCRYPTION_KEY:DJOxEDA9JiEEcrVM2jQkE5625vpBt3/9dwBQ0kWQ9AM=}
+
+logging:
+  level:
+    com.labassist: INFO
+    org.flywaydb: INFO
