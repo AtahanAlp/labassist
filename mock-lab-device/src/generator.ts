@@ -2,8 +2,8 @@ import { ANALYTES, Analyte, PANELS, PANEL_NAMES } from './domain/catalog';
 import { DeviceMessage, Scenario, TestItem } from './domain/types';
 import { Rng } from './rng';
 
-const FIRST_NAMES = ['Ada', 'Liam', 'Mia', 'Noah', 'Elif', 'Can', 'Zoe', 'Omar', 'Aylin', 'Deniz', 'Sara', 'Kerem', 'Lena', 'Ravi', 'Yusuf', 'Nora'];
-const LAST_NAMES = ['Yilmaz', 'Smith', 'Demir', 'Johnson', 'Kaya', 'Brown', 'Sahin', 'Garcia', 'Aydin', 'Koc', 'Patel', 'Wright', 'Arslan', 'Nguyen'];
+const FIRST_NAMES = ['Atahan', 'Mehmet', 'Ayse', 'Fatma', 'Mustafa', 'Elif', 'Emir', 'Zeynep', 'Can', 'Deniz', 'Kerem', 'Yusuf', 'Aylin', 'Hakan', 'Ece', 'Burak', 'Selin', 'Onur', 'Merve', 'Cem'];
+const LAST_NAMES = ['Yilmaz', 'Demir', 'Kaya', 'Sahin', 'Aydin', 'Koc', 'Arslan', 'Celik', 'Yildiz', 'Yildirim', 'Ozturk', 'Dogan', 'Kilic', 'Aslan', 'Cetin', 'Kara', 'Korkmaz', 'Polat', 'Ozdemir', 'Sen'];
 
 /** Weighted scenario mix for the background (live) emission stream. */
 const SCENARIO_WEIGHTS: Array<[Scenario, number]> = [
