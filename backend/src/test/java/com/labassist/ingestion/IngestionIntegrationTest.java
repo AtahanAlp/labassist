@@ -127,14 +127,18 @@ class IngestionIntegrationTest {
     }
 
     @Test
-    void patientNameIsEncryptedAtRestButReadableViaEntity() {
-        messageIngestor.ingest(message("E-1", "Ada Yilmaz", "F", List.of(test("K", 4.0))));
+    void piiIsEncryptedAtRestAndRedactedFromRawPayload() {
+        messageIngestor.ingest(message("E-1", "Atahan Yilmaz", "F", List.of(test("K", 4.0))));
 
-        String rawColumn = jdbcTemplate.queryForObject(
+        // Encrypted column holds ciphertext; the entity getter decrypts it.
+        String encryptedName = jdbcTemplate.queryForObject(
                 "select patient_name from lab_report where external_id = 'E-1'", String.class);
-        assertThat(rawColumn).isNotNull().isNotEqualTo("Ada Yilmaz");
+        assertThat(encryptedName).isNotNull().isNotEqualTo("Atahan Yilmaz");
+        assertThat(reportRepository.findAll().get(0).getPatientName()).isEqualTo("Atahan Yilmaz");
 
-        LabReport report = reportRepository.findAll().get(0);
-        assertThat(report.getPatientName()).isEqualTo("Ada Yilmaz");
+        // Raw payload keeps the structure but not the patient identifiers.
+        String rawPayload = jdbcTemplate.queryForObject(
+                "select raw_payload::text from lab_report where external_id = 'E-1'", String.class);
+        assertThat(rawPayload).doesNotContain("Atahan Yilmaz").doesNotContain("MRN-1001").contains("[REDACTED]");
     }
 }

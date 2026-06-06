@@ -28,10 +28,15 @@ public class AbnormalityEvaluator {
             return AnalyteFlag.UNKNOWN;
         }
         Optional<ReferenceRange> match = catalog.find(code, sex, age);
-        if (match.isEmpty()) {
-            return AnalyteFlag.UNKNOWN;
-        }
-        ReferenceRange range = match.get();
+        return match.map(range -> classify(range, value)).orElse(AnalyteFlag.UNKNOWN);
+    }
+
+    /**
+     * Pure classification of a measured value against a known range. Critical
+     * thresholds take precedence over the normal range. Side-effect free and
+     * dependency-free, so it is unit-tested directly without any test doubles.
+     */
+    public static AnalyteFlag classify(ReferenceRange range, BigDecimal value) {
         if (range.getCriticalLow() != null && value.compareTo(range.getCriticalLow()) < 0) {
             return AnalyteFlag.CRITICAL_LOW;
         }

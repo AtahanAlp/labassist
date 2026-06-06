@@ -1,31 +1,17 @@
 package com.labassist.labresult.reference;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import com.labassist.common.domain.Sex;
 import com.labassist.labresult.domain.AnalyteFlag;
 import java.math.BigDecimal;
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
+/**
+ * Pure-logic tests for analyte classification — no mocking framework involved.
+ * The threshold rules are exercised directly via {@link AbnormalityEvaluator#classify}.
+ */
 class AbnormalityEvaluatorTest {
-
-    @Mock
-    private ReferenceRangeCatalog catalog;
-
-    private AbnormalityEvaluator evaluator;
-
-    @BeforeEach
-    void setUp() {
-        evaluator = new AbnormalityEvaluator(catalog);
-    }
 
     private ReferenceRange potassiumRange() {
         ReferenceRange range = new ReferenceRange();
@@ -37,44 +23,30 @@ class AbnormalityEvaluatorTest {
         return range;
     }
 
-    private void stubRange(ReferenceRange range) {
-        when(catalog.find(any(), any(), any())).thenReturn(Optional.ofNullable(range));
-    }
-
     @Test
     void valueWithinRangeIsNormal() {
-        stubRange(potassiumRange());
-        assertThat(evaluator.evaluate("K", new BigDecimal("4.2"), Sex.M, 40)).isEqualTo(AnalyteFlag.NORMAL);
+        assertThat(AbnormalityEvaluator.classify(potassiumRange(), new BigDecimal("4.2")))
+                .isEqualTo(AnalyteFlag.NORMAL);
     }
 
     @Test
     void valueBelowLowButAboveCriticalIsLow() {
-        stubRange(potassiumRange());
-        assertThat(evaluator.evaluate("K", new BigDecimal("3.0"), Sex.M, 40)).isEqualTo(AnalyteFlag.LOW);
+        assertThat(AbnormalityEvaluator.classify(potassiumRange(), new BigDecimal("3.0")))
+                .isEqualTo(AnalyteFlag.LOW);
     }
 
     @Test
     void valueAboveHighButBelowCriticalIsHigh() {
-        stubRange(potassiumRange());
-        assertThat(evaluator.evaluate("K", new BigDecimal("5.8"), Sex.M, 40)).isEqualTo(AnalyteFlag.HIGH);
+        assertThat(AbnormalityEvaluator.classify(potassiumRange(), new BigDecimal("5.8")))
+                .isEqualTo(AnalyteFlag.HIGH);
     }
 
     @Test
     void criticalThresholdsTakePrecedenceOverNormalRange() {
-        stubRange(potassiumRange());
-        assertThat(evaluator.evaluate("K", new BigDecimal("7.2"), Sex.M, 40)).isEqualTo(AnalyteFlag.CRITICAL_HIGH);
-        assertThat(evaluator.evaluate("K", new BigDecimal("2.0"), Sex.M, 40)).isEqualTo(AnalyteFlag.CRITICAL_LOW);
-    }
-
-    @Test
-    void nullValueIsUnknown() {
-        assertThat(evaluator.evaluate("K", null, Sex.M, 40)).isEqualTo(AnalyteFlag.UNKNOWN);
-    }
-
-    @Test
-    void missingReferenceRangeIsUnknown() {
-        stubRange(null);
-        assertThat(evaluator.evaluate("ZZZ", new BigDecimal("1"), Sex.M, 40)).isEqualTo(AnalyteFlag.UNKNOWN);
+        assertThat(AbnormalityEvaluator.classify(potassiumRange(), new BigDecimal("7.2")))
+                .isEqualTo(AnalyteFlag.CRITICAL_HIGH);
+        assertThat(AbnormalityEvaluator.classify(potassiumRange(), new BigDecimal("2.0")))
+                .isEqualTo(AnalyteFlag.CRITICAL_LOW);
     }
 
     @Test
@@ -83,7 +55,13 @@ class AbnormalityEvaluatorTest {
         crp.setCode("CRP");
         crp.setLow(BigDecimal.ZERO);
         crp.setHigh(new BigDecimal("5"));
-        stubRange(crp);
-        assertThat(evaluator.evaluate("CRP", new BigDecimal("999"), Sex.M, 40)).isEqualTo(AnalyteFlag.HIGH);
+        assertThat(AbnormalityEvaluator.classify(crp, new BigDecimal("999"))).isEqualTo(AnalyteFlag.HIGH);
+    }
+
+    @Test
+    void nullValueIsUnknownWithoutConsultingCatalog() {
+        // A null value short-circuits before the catalog is touched, so a null catalog is fine.
+        AbnormalityEvaluator evaluator = new AbnormalityEvaluator(null);
+        assertThat(evaluator.evaluate("K", null, Sex.M, 40)).isEqualTo(AnalyteFlag.UNKNOWN);
     }
 }

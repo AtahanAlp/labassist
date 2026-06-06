@@ -2,6 +2,7 @@ package com.labassist.ingestion;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.labassist.common.domain.Sex;
 import com.labassist.ingestion.client.DeviceMessageDto;
 import com.labassist.ingestion.client.DeviceTestDto;
@@ -70,7 +71,7 @@ public class MessageIngestor {
             return IngestionOutcome.skipped();
         }
 
-        LabReport report = mapToReport(message, node.toString());
+        LabReport report = mapToReport(message, redactPii(node));
         Sex sex = report.getPatientSex();
         Integer age = report.getPatientAge();
 
@@ -131,12 +132,33 @@ public class MessageIngestor {
         report.setExternalId(externalId != null ? externalId : "MALFORMED-" + UUID.randomUUID());
         report.setStatus(ReportStatus.REJECTED);
         report.setRejectionReason(truncate(reason));
-        report.setRawPayload(node.toString());
+        report.setRawPayload(redactPii(node));
         report.setReceivedAt(Instant.now());
         report.setOverallAbnormal(false);
         reportRepository.save(report);
         log.debug("Rejected message externalId={} reason={}", externalId, reason);
         return IngestionOutcome.rejected();
+    }
+
+    /**
+     * Serializes the raw device payload with patient identifiers stripped.
+     *
+     * <p>The raw payload is retained for debugging/traceability, but name and MRN
+     * are the protected fields — they live encrypted in their own columns, so we
+     * never persist them in plaintext here.
+     */
+    private static String redactPii(JsonNode node) {
+        JsonNode copy = node.deepCopy();
+        if (copy.isObject() && copy.path("patient").isObject()) {
+            ObjectNode patient = (ObjectNode) copy.get("patient");
+            if (patient.has("name")) {
+                patient.put("name", "[REDACTED]");
+            }
+            if (patient.has("mrn")) {
+                patient.put("mrn", "[REDACTED]");
+            }
+        }
+        return copy.toString();
     }
 
     private static String rootMessage(Throwable e) {
